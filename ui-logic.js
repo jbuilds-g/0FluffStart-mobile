@@ -25,13 +25,60 @@ document.addEventListener("DOMContentLoaded", () => {
   updateClock();
   setInterval(updateClock, 1000);
 
+  // --- v1.8.0 POCKET: DOCK WIRING ---
+  const dockSearchBtn = document.getElementById("dockSearchBtn");
+  const dockSettingsBtn = document.getElementById("dockSettingsBtn");
+  const dockBackBtn = document.getElementById("dockBackBtn");
+  const searchPopup = document.getElementById("searchPopup");
   const searchInput = document.getElementById("searchInput");
-  if (searchInput) searchInput.focus();
+  const settingsModal = document.getElementById("settingsModal");
 
+  // 1. Expandable Search Button
+  if (dockSearchBtn && searchPopup) {
+    dockSearchBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      searchPopup.classList.toggle("hidden");
+
+      if (!searchPopup.classList.contains("hidden")) {
+        searchInput?.focus(); // Pops the keyboard only when opened
+      } else {
+        searchInput?.blur();
+      }
+    });
+  }
+
+  // 2. Settings Dock Button
+  if (dockSettingsBtn) {
+    dockSettingsBtn.addEventListener("click", () => {
+      toggleSettings(); // Reuses your existing function
+    });
+  }
+
+  // 3. Native Back Button
+  if (dockBackBtn) {
+    dockBackBtn.addEventListener("click", () => {
+      navigateToFolder(null);
+    });
+  }
+
+  // --- GLOBAL CLICKS (To close menus) ---
   document.addEventListener("click", (e) => {
+    // Engine dropdown auto-close
     if (!e.target.closest(".engine-switcher")) {
       document.getElementById("engineDropdown")?.classList.add("hidden");
     }
+
+    // Auto-close search popup if clicking outside of it (and not clicking the dock button)
+    if (
+      searchPopup &&
+      !searchPopup.classList.contains("hidden") &&
+      !searchPopup.contains(e.target) &&
+      e.target !== dockSearchBtn
+    ) {
+      searchPopup.classList.add("hidden");
+    }
+
+    // Auto-close suggestions
     if (
       !e.target.closest("#searchInput") &&
       !e.target.closest("#suggestionsContainer")
@@ -45,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("settingsModal")?.classList.remove("active");
       document.getElementById("engineDropdown")?.classList.add("hidden");
       document.getElementById("suggestionsContainer")?.classList.add("hidden");
+      document.getElementById("searchPopup")?.classList.add("hidden"); // Also close search on ESC
       if (
         !document
           .getElementById("linkEditorContainer")
@@ -56,57 +104,55 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// --- EVENT BINDING ---
+// --- EVENT BINDING (Bulletproofed with Optional Chaining '?') ---
 function bindStaticEvents() {
+  // Settings Modal
   document
     .getElementById("settingsToggleBtn")
-    .addEventListener("click", toggleSettings);
+    ?.addEventListener("click", toggleSettings);
   document
     .getElementById("closeSettingsBtn")
-    .addEventListener("click", () => closeModal("settingsModal"));
-  document.getElementById("settingsModal").addEventListener("click", (e) => {
+    ?.addEventListener("click", () => closeModal("settingsModal"));
+  document.getElementById("settingsModal")?.addEventListener("click", (e) => {
     if (e.target === document.getElementById("settingsModal"))
       closeModal("settingsModal");
   });
 
+  // Search Engine & Submits
   document
     .getElementById("engineDropdownBtn")
-    .addEventListener("click", toggleEngineDropdown);
+    ?.addEventListener("click", toggleEngineDropdown);
   document
     .getElementById("searchSubmitBtn")
-    .addEventListener("click", () =>
+    ?.addEventListener("click", () =>
       handleSearch({ key: "Enter", type: "click", preventDefault: () => {} }),
     );
 
   const searchInput = document.getElementById("searchInput");
-  searchInput.addEventListener("input", handleSuggestions);
-  searchInput.addEventListener("keypress", handleSearch);
+  searchInput?.addEventListener("input", handleSuggestions);
+  searchInput?.addEventListener("keypress", handleSearch);
 
+  // Link Editor
   document
     .getElementById("githubBtn")
-    .addEventListener("click", () =>
+    ?.addEventListener("click", () =>
       window.open("https://github.com/jbuilds-g/0FluffStart", "_blank"),
     );
-
-  // Default "Add Link" button on main settings screen uses the current dashboard folder
   document
     .getElementById("addLinkBtn")
-    .addEventListener("click", () => openEditor(null, currentFolderId));
-  const addFolderBtn = document.getElementById("addFolderBtn");
-  if (addFolderBtn) addFolderBtn.addEventListener("click", addFolder);
-
-  document.getElementById("saveLinkBtn").addEventListener("click", saveLink);
+    ?.addEventListener("click", () => openEditor(null, currentFolderId));
+  document.getElementById("addFolderBtn")?.addEventListener("click", addFolder);
+  document.getElementById("saveLinkBtn")?.addEventListener("click", saveLink);
   document
     .getElementById("cancelEditBtn")
-    .addEventListener("click", cancelEdit);
+    ?.addEventListener("click", cancelEdit);
 
-  // --- SELECTION MODE BUTTONS ---
+  // Selection Mode
   document
     .getElementById("cancelSelectionBtn")
     ?.addEventListener("click", () => {
       isSelectionMode = false;
       selectedLinkIds = [];
-      activeFolderId = null;
       renderLinkManager();
     });
 
@@ -118,59 +164,57 @@ function bindStaticEvents() {
 
       links.forEach((link) => {
         if (selectedLinkIds.includes(link.id)) {
-          link.parentId = activeFolderId;
+          link.parentId = editorTargetFolderId;
         }
       });
-
       localStorage.setItem("0fluff_links", JSON.stringify(links));
+
       isSelectionMode = false;
       selectedLinkIds = [];
-      activeFolderId = null;
       renderLinkManager();
       renderLinks();
     });
 
+  // Settings Toggles
   document
     .getElementById("userNameInput")
-    .addEventListener("input", autoSaveSettings);
+    ?.addEventListener("input", autoSaveSettings);
   document
     .getElementById("themeSelect")
-    .addEventListener("change", autoSaveSettings);
+    ?.addEventListener("change", autoSaveSettings);
   document
     .getElementById("clockStyleSelect")
-    .addEventListener("change", autoSaveSettings);
-
-  const showTitlesToggle = document.getElementById("showTitlesToggle");
-  if (showTitlesToggle)
-    showTitlesToggle.addEventListener("change", autoSaveSettings);
+    ?.addEventListener("change", autoSaveSettings);
+  document
+    .getElementById("showTitlesToggle")
+    ?.addEventListener("change", autoSaveSettings);
 
   const bgInput = document.getElementById("bgImageInput");
-  bgInput.addEventListener("change", () => handleImageUpload(bgInput));
+  bgInput?.addEventListener("change", () => handleImageUpload(bgInput));
+
   document
     .getElementById("resetBgBtn")
-    .addEventListener("click", clearBackground);
-
+    ?.addEventListener("click", clearBackground);
   document
     .getElementById("externalSuggestToggle")
-    .addEventListener("change", autoSaveSettings);
+    ?.addEventListener("change", autoSaveSettings);
   document
     .getElementById("historyEnabledToggle")
-    .addEventListener("change", autoSaveSettings);
+    ?.addEventListener("change", autoSaveSettings);
   document
     .getElementById("clearHistoryBtn")
-    .addEventListener("click", clearHistory);
-
+    ?.addEventListener("click", clearHistory);
   document
     .getElementById("backupDataBtn")
-    .addEventListener("click", backupData);
+    ?.addEventListener("click", backupData);
   document
     .getElementById("restoreDataBtn")
-    .addEventListener("click", () =>
-      document.getElementById("restoreInput").click(),
+    ?.addEventListener("click", () =>
+      document.getElementById("restoreInput")?.click(),
     );
   document
     .getElementById("restoreInput")
-    .addEventListener("change", restoreData);
+    ?.addEventListener("change", restoreData);
 
   document.querySelectorAll(".clock-radio").forEach((radio) => {
     radio.addEventListener("change", autoSaveSettings);
@@ -191,9 +235,8 @@ function bindStaticEvents() {
     });
   });
 
-  document.getElementById("resetSettingsBtn").addEventListener("click", () => {
-    const warning = "Are you sure? This action cannot be undone.";
-    if (confirm(warning)) {
+  document.getElementById("resetSettingsBtn")?.addEventListener("click", () => {
+    if (confirm("Are you sure? This action cannot be undone.")) {
       localStorage.removeItem("0fluff_settings");
       alert("Settings reset to default.");
       window.location.reload();
@@ -212,11 +255,14 @@ function applyClockStyle() {
 // --- FOLDER NAVIGATION & CREATION ---
 function navigateToFolder(folderId) {
   currentFolderId = folderId;
-  const header = document.getElementById("activeFolderHeader");
-  if (header) {
-    if (folderId) header.classList.remove("hidden");
-    else header.classList.add("hidden");
+
+  // Pocket UI: Show/Hide Dock Back Button
+  const dockBackBtn = document.getElementById("dockBackBtn");
+  if (dockBackBtn) {
+    if (folderId) dockBackBtn.classList.remove("hidden");
+    else dockBackBtn.classList.add("hidden");
   }
+
   renderLinks();
 }
 
@@ -242,6 +288,8 @@ function renderLinks() {
   const grid = document.getElementById("linkGrid");
   if (!grid) return;
   grid.innerHTML = "";
+
+  // The CSS class toggle isn't strictly necessary for the mobile ribbon, but keeping it safe
   grid.classList.toggle("show-titles", !!settings.showTitles);
 
   const visibleLinks = links.filter(
@@ -268,8 +316,9 @@ function renderLinks() {
     } else {
       const words = link.name.split(" ").filter((w) => w.length > 0);
       let acronym = words.map((word) => word.charAt(0).toUpperCase()).join("");
-      if (words.length === 1 && acronym.length === 1 && link.name.length > 1)
+      if (words.length === 1 && acronym.length === 1 && link.name.length > 1) {
         acronym = link.name.substring(0, 2).toUpperCase();
+      }
       const display = acronym.substring(0, 3);
 
       let fontSize =
@@ -302,30 +351,7 @@ function renderLinks() {
   });
 
   grid.appendChild(fragment);
-
-  // --- NEW: SOLID PILL WITH INNER CIRCLE ---
-  if (currentFolderId !== null) {
-    const exitContainer = document.createElement("div");
-    exitContainer.className = "folder-exit-container";
-
-    // Notice the new <div class="back-icon-circle"> wrapping the SVG
-    exitContainer.innerHTML = `
-      <div class="back-pill" title="Back to Dashboard">
-        <div class="back-icon-circle">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-        </div>
-        <span class="back-text">DASHBOARD</span>
-      </div>
-    `;
-
-    const backBtn = exitContainer.querySelector(".back-pill");
-    backBtn.addEventListener("click", () => {
-      navigateToFolder(null);
-    });
-
-    grid.appendChild(exitContainer);
-  }
-} // End of renderLinks() function
+}
 
 // --- SELECTION TOGGLE ---
 function toggleSelection(id) {
@@ -371,7 +397,6 @@ function renderLinkManager() {
   const folderSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
   const linkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; opacity: 0.5;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`;
 
-  // --- ITEM BUILDER ---
   function createManagerItem(link, isSubItem = false, isSelectable = false) {
     const item = document.createElement("div");
     item.className = "link-manager-item";
@@ -396,10 +421,10 @@ function renderLinkManager() {
     nameSpan.style.alignItems = "center";
 
     let prefix = "";
-    // ALWAYS show the folder toggle arrow, even in selection mode
     if (link.isFolder) {
       prefix += `<span class="folder-toggle" style="cursor:pointer; margin-right:8px; color:var(--accent); font-size:12px; width:12px; display:inline-block; text-align:center;">▶</span>`;
     }
+
     nameSpan.innerHTML =
       prefix + (link.isFolder ? folderSvg : linkSvg) + link.name;
 
@@ -419,12 +444,13 @@ function renderLinkManager() {
       leftContainer.appendChild(nameSpan);
 
       item.appendChild(leftContainer);
+
       item.style.cursor = "pointer";
       item.onclick = (e) => {
-        // Prevent checking the box if they just clicked the expand/collapse arrow
         if (e.target.classList.contains("folder-toggle")) return;
-
-        if (e.target !== checkbox) checkbox.checked = !checkbox.checked;
+        if (e.target !== checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
         toggleSelection(link.id);
       };
     } else {
@@ -478,13 +504,10 @@ function renderLinkManager() {
     return item;
   }
 
-  // --- RENDER LOOP ---
-  // We use one unified tree loop for BOTH normal and selection mode!
   links
     .filter((l) => !l.parentId)
     .forEach((rootLink) => {
-      // If we are adding items TO a folder, hide that destination folder from the list
-      if (isSelectionMode && rootLink.id === activeFolderId) return;
+      if (isSelectionMode && rootLink.id === editorTargetFolderId) return;
 
       const row = createManagerItem(rootLink, false, isSelectionMode);
       fragment.appendChild(row);
@@ -514,7 +537,6 @@ function renderLinkManager() {
             );
           });
 
-        // Only inject the "+ New Link" / "+ Existing" buttons in NORMAL mode
         if (!isSelectionMode) {
           const actionRow = document.createElement("div");
           actionRow.style.display = "flex";
@@ -545,7 +567,7 @@ function renderLinkManager() {
           addExistingBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Existing`;
           addExistingBtn.onclick = () => {
             isSelectionMode = true;
-            activeFolderId = rootLink.id;
+            editorTargetFolderId = rootLink.id;
             selectedLinkIds = [];
             renderLinkManager();
           };
@@ -559,7 +581,6 @@ function renderLinkManager() {
       }
     });
 
-  // Failsafe: if the user opens selection mode but there's literally nothing else to select
   if (isSelectionMode && fragment.children.length === 0) {
     const emptyMsg = document.createElement("div");
     emptyMsg.innerText = "No other links or folders available.";
@@ -584,7 +605,6 @@ function openEditor(id = null, parentId = null) {
   const urlInput = document.getElementById("editUrl");
 
   isEditingId = id;
-  // If we clicked "+ New Link" inside a nested folder, save that destination
   editorTargetFolderId = parentId !== null ? parentId : currentFolderId;
 
   if (id) {
@@ -592,7 +612,6 @@ function openEditor(id = null, parentId = null) {
     if (link) {
       titleEl.innerText = link.isFolder ? "Edit Folder" : "Edit Link";
       nameInput.value = link.name;
-
       if (link.isFolder) {
         urlInput.style.display = "none";
         urlInput.value = "";
@@ -613,7 +632,7 @@ function cancelEdit() {
   document.getElementById("linkEditorContainer")?.classList.add("hidden");
   document.getElementById("linkListContainer")?.classList.remove("hidden");
   isEditingId = null;
-  editorTargetFolderId = null; // Clear the target
+  editorTargetFolderId = null;
 }
 
 function saveLink() {
@@ -637,14 +656,13 @@ function saveLink() {
       name,
       url,
       isFolder: false,
-      // Uses the target folder from the settings dropdown, or defaults to the dashboard folder
       parentId:
         editorTargetFolderId !== null ? editorTargetFolderId : currentFolderId,
     });
   }
 
   localStorage.setItem("0fluff_links", JSON.stringify(links));
-  editorTargetFolderId = null; // Reset target after saving
+  editorTargetFolderId = null;
   renderLinks();
   renderLinkManager();
   cancelEdit();
@@ -679,8 +697,9 @@ async function loadSettings() {
   if (userNameInput) userNameInput.value = settings.userName || "";
 
   const radios = document.getElementsByName("clockFormat");
-  for (let r of radios)
+  for (let r of radios) {
     if (r.value === (settings.clockFormat || "24h")) r.checked = true;
+  }
 
   const externalSuggestToggle = document.getElementById(
     "externalSuggestToggle",
@@ -720,6 +739,7 @@ async function loadSettings() {
     document.body.style.backgroundImage = "";
     if (overlay) overlay.style.opacity = "0";
   }
+
   updateClock();
   renderEngineDropdown();
   triggerMaterialYou();
@@ -733,7 +753,9 @@ function autoSaveSettings() {
     document.getElementById("userNameInput")?.value.trim() || "";
 
   const radios = document.getElementsByName("clockFormat");
-  for (let r of radios) if (r.checked) settings.clockFormat = r.value;
+  for (let r of radios) {
+    if (r.checked) settings.clockFormat = r.value;
+  }
 
   settings.externalSuggest = !!document.getElementById("externalSuggestToggle")
     ?.checked;
@@ -742,13 +764,19 @@ function autoSaveSettings() {
   settings.showTitles = !!document.getElementById("showTitlesToggle")?.checked;
 
   localStorage.setItem("0fluff_settings", JSON.stringify(settings));
+
   document.body.className = settings.theme;
   applyClockStyle();
   triggerMaterialYou();
 
-  document
-    .getElementById("linkGrid")
-    ?.classList.toggle("show-titles", settings.showTitles);
+  const grid = document.getElementById("linkGrid");
+  if (grid) {
+    if (settings.showTitles) {
+      grid.classList.add("show-titles");
+    } else {
+      grid.classList.remove("show-titles");
+    }
+  }
 }
 
 function toggleSettings() {
@@ -757,8 +785,6 @@ function toggleSettings() {
   const modal = document.getElementById("settingsModal");
   if (modal) {
     modal.classList.add("active");
-
-    // --- NEW: Sync Wallpaper Label State ---
     const bgLabel = document.getElementById("bgFileName");
     if (bgLabel) {
       if (settings.backgroundImage === "indexeddb") {
@@ -771,6 +797,7 @@ function toggleSettings() {
     }
   }
 }
+
 function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.remove("active");
@@ -786,15 +813,14 @@ function renderEngineDropdown() {
     searchEngines.find((s) => s.name === settings.searchEngine) ||
     searchEngines[0];
 
-  // --- CHANGE 1: Update the main icon next to the search bar ---
   const iconEl = document.getElementById("currentEngineIcon");
-  if (iconEl) iconEl.innerHTML = current.icon; // Changed from .innerText and .initial
+  if (iconEl) iconEl.innerHTML = current.icon;
 
   searchEngines.forEach((e) => {
     const div = document.createElement("div");
-    div.className = `engine-option ${e.name === settings.searchEngine ? "selected" : ""}`;
-
-    // --- CHANGE 2: Update the dropdown list to render the SVG ---
+    div.className = `engine-option ${
+      e.name === settings.searchEngine ? "selected" : ""
+    }`;
     div.innerHTML = `<span class="engine-icon">${e.icon}</span> <span>${e.name}</span>`;
 
     div.addEventListener("click", () => {
@@ -808,17 +834,22 @@ function renderEngineDropdown() {
 }
 
 function toggleEngineDropdown() {
-  document.getElementById("engineDropdown")?.classList.toggle("hidden");
+  const dropdown = document.getElementById("engineDropdown");
+  if (dropdown) dropdown.classList.toggle("hidden");
 }
 
 function handleSearch(e) {
   if (e.key === "Enter" || e.type === "click") {
-    const val = document.getElementById("searchInput")?.value.trim();
+    const searchInput = document.getElementById("searchInput");
+    const val = searchInput ? searchInput.value.trim() : "";
     if (!val) return;
-    logSearch(val);
+
+    if (typeof logSearch === "function") logSearch(val);
+
     const engine =
       searchEngines.find((s) => s.name === settings.searchEngine) ||
       searchEngines[0];
+
     if (val.includes(".") && !val.includes(" ")) {
       window.location.href = val.startsWith("http") ? val : `https://${val}`;
     } else {
@@ -828,20 +859,27 @@ function handleSearch(e) {
 }
 
 function selectSuggestion(suggestion) {
-  document.getElementById("searchInput").value = suggestion.name;
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) searchInput.value = suggestion.name;
+
   if (suggestion.type === "Link") {
     window.location.href = suggestion.url.startsWith("http")
       ? suggestion.url
       : `https://${suggestion.url}`;
   } else {
-    document.getElementById("suggestionsContainer")?.classList.add("hidden");
+    const container = document.getElementById("suggestionsContainer");
+    if (container) container.classList.add("hidden");
     handleSearch({ key: "Enter", type: "synthetic", preventDefault: () => {} });
   }
 }
 
 // Backup & Restore
 function backupData() {
-  const data = { links, settings, history: searchHistory };
+  const data = {
+    links,
+    settings,
+    history: typeof searchHistory !== "undefined" ? searchHistory : [],
+  };
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: "application/json",
   });
@@ -883,7 +921,6 @@ function restoreData(e) {
 // MATERIAL YOU (MONET) ENGINE
 // ==========================================
 
-// Extracts the average RGB color from an image using a 1x1 canvas
 function getAverageColor(imgElement) {
   const canvas = document.createElement("canvas");
   canvas.width = 1;
@@ -894,16 +931,18 @@ function getAverageColor(imgElement) {
   return { r, g, b };
 }
 
-// Converts RGB to HSL and returns the Hue (0-360)
 function rgbToHue(r, g, b) {
   r /= 255;
   g /= 255;
   b /= 255;
+
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b);
   let h;
-  if (max === min) h = 0;
-  else {
+
+  if (max === min) {
+    h = 0;
+  } else {
     const d = max - min;
     switch (max) {
       case r:
@@ -921,25 +960,18 @@ function rgbToHue(r, g, b) {
   return Math.round(h * 360);
 }
 
-// Applies the Material You palette directly to the body
 function applyMaterialYouTheme(hue) {
   const target = document.body;
-
   target.style.setProperty("--bg", `hsl(${hue}, 20%, 10%)`);
   target.style.setProperty("--card", `hsl(${hue}, 25%, 15%)`);
   target.style.setProperty("--card-hover", `hsl(${hue}, 30%, 20%)`);
   target.style.setProperty("--border", `hsl(${hue}, 20%, 25%)`);
-
-  // THE FIX: Pushed saturation to 50% and dropped lightness down to 75%
-  // This makes the tint much richer, darker, and more prominent!
   target.style.setProperty("--text", `hsl(${hue}, 50%, 75%)`);
-
   target.style.setProperty("--accent", `hsl(${hue}, 60%, 65%)`);
 }
 
-// The Trigger that starts the Engine
 async function triggerMaterialYou() {
-  const target = document.body; // <-- THIS WAS THE BUG. Fixed.
+  const target = document.body;
 
   if (settings.theme !== "material-you") {
     target.style.removeProperty("--bg");
@@ -979,8 +1011,10 @@ async function triggerMaterialYou() {
 }
 
 // Global Exports
-window.handleImageUpload = handleImageUpload;
-window.clearBackground = clearBackground;
+window.handleImageUpload =
+  typeof handleImageUpload !== "undefined" ? handleImageUpload : null;
+window.clearBackground =
+  typeof clearBackground !== "undefined" ? clearBackground : null;
 window.renderLinks = renderLinks;
 window.renderEngineDropdown = renderEngineDropdown;
 window.toggleEngineDropdown = toggleEngineDropdown;
@@ -994,7 +1028,6 @@ window.handleSearch = handleSearch;
 window.selectSuggestion = selectSuggestion;
 window.cancelEdit = cancelEdit;
 window.autoSaveSettings = autoSaveSettings;
-window.clearHistory = clearHistory;
 window.backupData = backupData;
 window.restoreData = restoreData;
 window.navigateToFolder = navigateToFolder;

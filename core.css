@@ -99,17 +99,24 @@ body {
 
 /* The Search Button */
 .active-fab {
-  background: var(--accent);
-  color: #fff;
-  width: 60px;
-  height: 60px;
-  border-radius: 20px; /* The premium iOS-style squarcle */
-  transform: translateY(-25px); /* Floats it above the dock */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: rgba(
+    255,
+    255,
+    255,
+    0.08
+  ); /* Subtle highlight instead of a solid color */
+  color: var(--text);
+  width: 50px;
+  height: 50px;
+  border-radius: 16px; /* Gentle squarcle */
+  transform: translateY(0); /* Locked firmly in the dock */
+  box-shadow: none; /* Removed the floating shadow */
+  transition: all 0.2s ease;
 }
 
 .active-fab:active {
-  transform: translateY(-22px) scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.95);
 }
 
 /* --- 3. SEARCH POPUP --- */
