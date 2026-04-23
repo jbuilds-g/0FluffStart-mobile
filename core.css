@@ -1,228 +1,163 @@
-/* core.css */
+/* core.css - 0Fluff Pocket Shell */
 
-/* --- BASE LAYOUT --- */
-* {
-  /* Disable the default mobile tap highlight flash */
-  -webkit-tap-highlight-color: transparent;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Kills the ugly blue tap flash on mobile */
 }
 
 body {
-  font-family: var(--font-main);
   margin: 0;
-  padding: 20px;
+  font-family: var(--font-main, system-ui, -apple-system, sans-serif);
+  background-color: var(--bg);
+  color: var(--text);
+  overflow: hidden; /* Prevents the whole website from bouncing when you scroll */
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.3s;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: env(safe-area-inset-top, 40px);
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
+}
+
+/* --- 1. AT-A-GLANCE (The Anchor) --- */
+.at-a-glance {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
-}
-
-/* Main Container */
-.container {
-  width: 100%;
-  max-width: 600px;
-  padding-bottom: 50px;
-}
-
-/* --- HEADER SECTION --- */
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-h1 {
-  margin: 0;
-  font-size: 2rem;
-  letter-spacing: -1px;
-}
-
-/* Header Buttons */
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  margin-top: 12vh; /* Pushes it down into the upper-middle */
+  margin-bottom: auto; /* Pushes the link ribbon to the bottom */
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Keeps text readable on bright wallpapers */
 }
 
-.icon-btn:hover {
-  color: var(--accent);
-}
-
-/* --- CLOCK & GREETING --- */
 .clock {
-  font-size: 1.8rem;
-  font-weight: 300;
-  color: var(--accent);
-  margin-bottom: 5px;
-  font-variant-numeric: tabular-nums;
+  font-size: 4.5rem;
+  font-weight: 200;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
 .greeting {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--dim);
-  margin-bottom: 30px;
   font-weight: 500;
 }
 
-/* --- UTILITIES --- */
-.hidden {
+/* --- 2. BOTTOM DOCK (The Command Center) --- */
+.bottom-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(80px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Glassmorphism! */
+  background: rgba(20, 20, 24, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px 32px 0 0;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  z-index: 9999;
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: var(--dim);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.dock-btn.hidden {
   display: none !important;
 }
 
-/* --- FLOATING SETTINGS BUTTON (v1.1.0) --- */
-.floating-settings {
+/* The Search Button */
+.active-fab {
+  background: var(--accent);
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px; /* The premium iOS-style squarcle */
+  transform: translateY(-25px); /* Floats it above the dock */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.active-fab:active {
+  transform: translateY(-22px) scale(0.95);
+}
+
+/* --- 3. SEARCH POPUP --- */
+.search-popup {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 50;
-}
-
-.floating-btn {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition:
-    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    box-shadow 0.3s,
-    background 0.3s;
-}
-
-.floating-btn:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  background: var(--card-hover);
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-/* --- DESKTOP OPTIMIZATIONS (Core Layout) --- */
-@media (min-width: 768px) {
-  .container {
-    max-width: 900px;
-    padding-top: 50px;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-  }
-
-  .clock {
-    font-size: 2.5rem;
-  }
-
-  .greeting {
-    font-size: 1.2rem;
-  }
-}
-
-/* --- FOLDER ICON & TEXT MORPH FIX --- */
-/* Turns SVG dark on hover */
-.link-item:hover .link-icon-circle svg {
-  stroke: var(--bg) !important;
-}
-
-/* Turns Text icon dark on hover */
-.link-item:hover .link-icon-circle span {
-  color: var(--bg) !important;
-}
-
-/* --- SMART TITLE HOVER LOGIC --- */
-/* If the user has NOT checked "Show Titles", hide them by default... */
-.link-grid:not(.show-titles) .link-name {
-  display: block !important;
-  opacity: 0;
-  transform: translateY(5px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  pointer-events: none; /* Prevents invisible titles from blocking clicks */
-}
-
-/* Show title when hovering over the item */
-.link-grid:not(.show-titles) .link-item:hover .link-name {
-  opacity: 1;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  left: 5%;
+  width: 90%;
+  z-index: 9998;
   transform: translateY(0);
-}
-
-/* If the user HAS checked "Show Titles", keep them visible normally */
-.link-grid.show-titles .link-name {
   opacity: 1;
-  transform: none;
-  pointer-events: auto;
-}
-/* --- SEARCH ENGINE SVG SIZING --- */
-/* Forces all SVGs (Bootstrap & SimpleIcons) to be the exact same size */
-.engine-switcher svg,
-#engineDropdown .engine-option svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-  fill: currentColor; /* For Bootstrap */
-  color: currentColor; /* For Lucide/Feather */
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* --- THE SOLID PILL BACK BUTTON --- */
-.folder-exit-container {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  padding: 40px 0 20px;
-  width: 100%;
+.search-popup.hidden {
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
 }
 
-.back-pill {
+.search-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  /* 8px padding on the left to tightly hug the circle, 24px on right for the text */
-  padding: 8px 24px 8px 8px;
-  background: var(--card-bg); /* Solid color 1 (Main Element) */
+  background: var(--card);
+  border-radius: 99px;
+  padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: 50px;
-  color: var(--text);
-  font-family: var(--font-main);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-  /* NO transparency / backdrop-filter */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* The new inner circle for the arrow */
-.back-icon-circle {
+#searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.1rem;
+  padding: 0 12px;
+  outline: none;
+}
+
+.search-icon,
+.engine-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--accent); /* Solid color 2 (Circle Element) */
-  border-radius: 50%;
-  color: var(
-    --bg
-  ); /* Keeps the arrow itself visible against the accent color */
-}
-
-.back-icon-circle svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* Clean, solid hover state */
-.back-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  border-color: var(--accent);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
