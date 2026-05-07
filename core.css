@@ -1,10 +1,13 @@
-/* core.css - 0Fluff Pocket Shell */
+/* core.css - 0Fluff Pocket Shell (Consolidated) */
 
+/* =========================================
+   1. GLOBAL & LAYOUT
+   ========================================= */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent; /* Kills the ugly blue tap flash on mobile */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -12,7 +15,7 @@ body {
   font-family: var(--font-main, system-ui, -apple-system, sans-serif);
   background-color: var(--bg);
   color: var(--text);
-  overflow: hidden; /* Prevents the whole website from bouncing when you scroll */
+  overflow: hidden;
 }
 
 .bg-overlay {
@@ -31,16 +34,15 @@ body {
   padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
 }
 
-/* --- 1. AT-A-GLANCE (The Anchor) --- */
 .at-a-glance {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 12vh; /* Pushes it down into the upper-middle */
-  margin-bottom: auto; /* Pushes the link ribbon to the bottom */
+  margin-top: 12vh;
+  margin-bottom: auto;
   text-align: center;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Keeps text readable on bright wallpapers */
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .clock {
@@ -57,7 +59,9 @@ body {
   font-weight: 500;
 }
 
-/* --- 2. BOTTOM DOCK (The Command Center) --- */
+/* =========================================
+   2. BOTTOM DOCK & SEARCH
+   ========================================= */
 .bottom-dock {
   position: fixed;
   bottom: 0;
@@ -65,14 +69,11 @@ body {
   width: 100%;
   height: calc(80px + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
-
-  /* Glassmorphism! */
   background: rgba(20, 20, 24, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 32px 32px 0 0;
-
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -97,20 +98,14 @@ body {
   display: none !important;
 }
 
-/* The Search Button */
 .active-fab {
-  background: rgba(
-    255,
-    255,
-    255,
-    0.08
-  ); /* Subtle highlight instead of a solid color */
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text);
   width: 50px;
   height: 50px;
-  border-radius: 16px; /* Gentle squarcle */
-  transform: translateY(0); /* Locked firmly in the dock */
-  box-shadow: none; /* Removed the floating shadow */
+  border-radius: 16px;
+  transform: translateY(0);
+  box-shadow: none;
   transition: all 0.2s ease;
 }
 
@@ -119,7 +114,6 @@ body {
   transform: scale(0.95);
 }
 
-/* --- 3. SEARCH POPUP --- */
 .search-popup {
   position: fixed;
   bottom: calc(100px + env(safe-area-inset-bottom, 0px));
@@ -168,13 +162,7 @@ body {
   font-weight: bold;
   font-size: 1.1rem;
 }
-/* --- FIX 1: Z-INDEX OVERRIDE FOR SETTINGS --- */
-/* Forces the settings menu to appear above the bottom dock */
-.modal {
-  z-index: 10000 !important;
-}
 
-/* --- FIX 2: SEARCH ENGINE STYLING --- */
 .engine-switcher {
   position: relative;
   display: flex;
@@ -194,7 +182,6 @@ body {
   align-items: center;
 }
 
-/* Make the dropdown menu pop UP instead of down, since we are at the bottom of the screen! */
 .engine-dropdown {
   position: absolute;
   bottom: 140%;
@@ -227,24 +214,20 @@ body {
 .engine-option:active {
   background: var(--card-hover);
 }
-/* modules.css - The Horizontal Ribbon */
 
-/* --- 1. THE SCROLLING TRACK --- */
+/* =========================================
+   3. HORIZONTAL RIBBON (MODULES)
+   ========================================= */
 .mobile-grid {
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-
-  /* This is the secret to making it feel native. It forces the scroll to "snap" to icons */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-
   gap: 24px;
-  padding: 20px 30px; /* Leaves space on the edges so the first icon isn't flush against the screen */
+  padding: 20px 30px;
   margin-bottom: 10px;
-
-  /* Hides the ugly scrollbar on mobile browsers */
   scrollbar-width: none;
 }
 
@@ -252,11 +235,10 @@ body {
   display: none;
 }
 
-/* --- 2. THE APP ICONS --- */
 .link-item {
-  flex: 0 0 auto; /* Prevents icons from squishing together */
+  flex: 0 0 auto;
   width: 75px;
-  scroll-snap-align: center; /* Tells the track to snap right to the middle of the icon */
+  scroll-snap-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -267,14 +249,11 @@ body {
 .link-icon-circle {
   width: 70px;
   height: 70px;
-  border-radius: 22px; /* Squarcle shape */
-
-  /* Glassmorphism for the icons too! */
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -282,7 +261,6 @@ body {
   transition: transform 0.2s ease;
 }
 
-/* Simulates actual pressing physics on mobile */
 .link-item:active .link-icon-circle {
   transform: scale(0.9);
 }
@@ -292,18 +270,16 @@ body {
   color: var(--text);
   text-align: center;
   width: 100%;
-
-  /* Truncates long names with "..." so it never breaks to a second line */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
   font-weight: 600;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
-/* settings.css */
 
-/* --- MODAL STRUCTURE --- */
+/* =========================================
+   4. SETTINGS MODAL
+   ========================================= */
 .modal {
   position: fixed;
   top: 0;
@@ -314,7 +290,7 @@ body {
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 9999 !important;
+  z-index: 10000 !important;
   backdrop-filter: blur(3px);
   overflow-y: hidden;
 }
@@ -352,7 +328,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Desktop Drawer Mode */
 @media (min-width: 768px) {
   .modal {
     justify-content: flex-end;
@@ -378,7 +353,6 @@ body {
   }
 }
 
-/* --- COLLAPSIBLE CATEGORIES --- */
 .category-panel {
   background: transparent;
   border-bottom: 1px solid var(--border);
@@ -425,7 +399,6 @@ body {
   }
 }
 
-/* --- SETTINGS GROUPS & HELP TOOLTIPS --- */
 .setting-group {
   margin-bottom: 25px;
 }
@@ -486,7 +459,6 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-/* --- FORM ELEMENTS --- */
 input[type="text"],
 input[type="url"] {
   width: 100%;
@@ -507,7 +479,6 @@ input:focus {
   border-color: var(--accent);
 }
 
-/* --- ENHANCED NATIVE SELECT --- */
 select {
   width: 100%;
   padding: 12px;
@@ -531,17 +502,13 @@ select {
     border-color 0.2s,
     box-shadow 0.2s;
   cursor: pointer;
-
-  /* THE MAGIC FIX: Forces the OS to render the native dropdown in Dark Mode */
   color-scheme: dark;
 }
 
-/* Explicitly force options to be dark with white text so they never turn invisible */
 select option {
   background-color: #141418;
   color: #ffffff;
 }
-
 select:focus,
 select:hover {
   border-color: var(--accent);
@@ -572,7 +539,6 @@ select:hover {
   margin: 0;
 }
 
-/* --- BUTTONS --- */
 .icon-btn {
   width: 36px;
   height: 36px;
@@ -637,7 +603,6 @@ select:hover {
   background: rgba(0, 170, 255, 0.1);
 }
 
-/* Custom file input */
 .hidden-input {
   display: none;
 }
@@ -663,7 +628,6 @@ select:hover {
   color: var(--accent);
 }
 
-/* Manager Link List */
 .link-manager-list {
   display: flex;
   flex-direction: column;

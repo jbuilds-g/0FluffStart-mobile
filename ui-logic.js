@@ -341,6 +341,30 @@ function renderLinks() {
       });
     }
 
+    // --- MOBILE: Long-Press to Edit ---
+    let pressTimer;
+
+    item.addEventListener(
+      "touchstart",
+      () => {
+        pressTimer = setTimeout(() => {
+          // Trigger edit after 500ms hold
+          toggleSettings();
+          editLink(link.id);
+        }, 500);
+      },
+      { passive: true },
+    ); // Passive listener ensures horizontal scrolling doesn't stutter
+
+    // Cancel the long-press if the user scrolls or releases early
+    item.addEventListener("touchend", () => clearTimeout(pressTimer), {
+      passive: true,
+    });
+    item.addEventListener("touchmove", () => clearTimeout(pressTimer), {
+      passive: true,
+    });
+
+    // --- DESKTOP FALLBACK: Right-Click ---
     item.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       toggleSettings();

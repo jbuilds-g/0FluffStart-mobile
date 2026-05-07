@@ -24,9 +24,31 @@ if (needsSave) {
   localStorage.setItem("0fluff_links", JSON.stringify(links));
 }
 
-// Helper to persist the current state of links to local storage
+// --- STATE PERSISTENCE & MOBILE HEARTBEAT ---
 function saveLinksState() {
   localStorage.setItem("0fluff_links", JSON.stringify(links));
+  syncMobileHeartbeat();
+}
+
+function saveSettingsState() {
+  localStorage.setItem("0fluff_settings", JSON.stringify(settings));
+  syncMobileHeartbeat();
+}
+
+function saveHistoryState() {
+  localStorage.setItem("0fluff_history", JSON.stringify(searchHistory));
+  syncMobileHeartbeat();
+}
+
+// Mobile Data Heartbeat: Mirrors state to extension storage to prevent aggressive suspension wipes
+function syncMobileHeartbeat() {
+  if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.set({
+      "0fluff_links": links,
+      "0fluff_settings": settings,
+      "0fluff_history": searchHistory,
+    });
+  }
 }
 
 // --- SETTINGS & HISTORY ---
