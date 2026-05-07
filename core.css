@@ -168,3 +168,522 @@ body {
   font-weight: bold;
   font-size: 1.1rem;
 }
+/* --- FIX 1: Z-INDEX OVERRIDE FOR SETTINGS --- */
+/* Forces the settings menu to appear above the bottom dock */
+.modal {
+  z-index: 10000 !important;
+}
+
+/* --- FIX 2: SEARCH ENGINE STYLING --- */
+.engine-switcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--border);
+  padding-right: 12px;
+  margin-right: 8px;
+}
+
+.engine-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--card-hover);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Make the dropdown menu pop UP instead of down, since we are at the bottom of the screen! */
+.engine-dropdown {
+  position: absolute;
+  bottom: 140%;
+  left: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  z-index: 10001;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.engine-dropdown.hidden {
+  display: none;
+}
+
+.engine-option {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--text);
+  font-family: var(--font-main);
+}
+
+.engine-option:active {
+  background: var(--card-hover);
+}
+/* modules.css - The Horizontal Ribbon */
+
+/* --- 1. THE SCROLLING TRACK --- */
+.mobile-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* This is the secret to making it feel native. It forces the scroll to "snap" to icons */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  gap: 24px;
+  padding: 20px 30px; /* Leaves space on the edges so the first icon isn't flush against the screen */
+  margin-bottom: 10px;
+
+  /* Hides the ugly scrollbar on mobile browsers */
+  scrollbar-width: none;
+}
+
+.mobile-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- 2. THE APP ICONS --- */
+.link-item {
+  flex: 0 0 auto; /* Prevents icons from squishing together */
+  width: 75px;
+  scroll-snap-align: center; /* Tells the track to snap right to the middle of the icon */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.link-icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 22px; /* Squarcle shape */
+
+  /* Glassmorphism for the icons too! */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+/* Simulates actual pressing physics on mobile */
+.link-item:active .link-icon-circle {
+  transform: scale(0.9);
+}
+
+.link-name {
+  font-size: 0.85rem;
+  color: var(--text);
+  text-align: center;
+  width: 100%;
+
+  /* Truncates long names with "..." so it never breaks to a second line */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+/* settings.css */
+
+/* --- MODAL STRUCTURE --- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999 !important;
+  backdrop-filter: blur(3px);
+  overflow-y: hidden;
+}
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg);
+  padding: 25px;
+  padding-bottom: 40px;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 450px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  transform: scale(0.95);
+  opacity: 0;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
+}
+.modal.active .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Desktop Drawer Mode */
+@media (min-width: 768px) {
+  .modal {
+    justify-content: flex-end;
+    align-items: stretch;
+  }
+  .modal-content {
+    width: 400px;
+    max-width: none;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid var(--border);
+    margin: 0;
+    transform: translateX(100%);
+    opacity: 1;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal.active .modal-content {
+    transform: translateX(0);
+  }
+}
+
+/* --- COLLAPSIBLE CATEGORIES --- */
+.category-panel {
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 5px;
+}
+.category-panel:last-of-type {
+  border-bottom: none;
+}
+.category-panel summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.category-panel summary::-webkit-details-marker {
+  display: none;
+}
+.category-panel summary .chevron {
+  transition: transform 0.3s ease;
+  color: var(--dim);
+}
+.category-panel[open] summary .chevron {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+.category-content {
+  padding: 10px 5px 20px 5px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- SETTINGS GROUPS & HELP TOOLTIPS --- */
+.setting-group {
+  margin-bottom: 25px;
+}
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+.setting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.setting-group h3 {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.help-btn {
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  color: var(--dim);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.help-btn:hover,
+.help-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--card);
+}
+
+.help-text {
+  display: none;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  color: var(--dim);
+  line-height: 1.4;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.help-text.show {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+/* --- FORM ELEMENTS --- */
+input[type="text"],
+input[type="url"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  outline: none;
+  appearance: none;
+  font-family: var(--font-main);
+  transition: border-color 0.2s;
+}
+input:focus {
+  border-color: var(--accent);
+}
+
+/* --- ENHANCED NATIVE SELECT --- */
+select {
+  width: 100%;
+  padding: 12px;
+  padding-right: 40px;
+  margin-bottom: 10px;
+  background-color: var(--card-hover);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--font-main);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  cursor: pointer;
+
+  /* THE MAGIC FIX: Forces the OS to render the native dropdown in Dark Mode */
+  color-scheme: dark;
+}
+
+/* Explicitly force options to be dark with white text so they never turn invisible */
+select option {
+  background-color: #141418;
+  color: #ffffff;
+}
+
+select:focus,
+select:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 170, 255, 0.1);
+}
+
+.radio-row {
+  display: flex;
+  gap: 10px;
+}
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-hover);
+  padding: 10px 15px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  flex: 1;
+  border: 1px solid var(--border);
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+.radio-option:hover {
+  background: var(--card);
+}
+.radio-option input {
+  margin: 0;
+}
+
+/* --- BUTTONS --- */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.2s;
+}
+.icon-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.save-btn {
+  width: 100%;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 12px;
+  border-radius: var(--radius);
+  font-weight: bold;
+  border: none;
+  font-size: 1rem;
+  margin-top: 10px;
+  font-family: var(--font-main);
+  cursor: pointer;
+}
+
+.secondary {
+  background: var(--card-hover);
+  color: var(--text);
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-main);
+}
+.secondary:hover {
+  border-color: var(--dim);
+}
+
+.add-link-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--accent);
+  padding: 10px;
+  border-radius: var(--radius);
+  font-weight: bold;
+  border: 1px dashed var(--accent);
+  font-size: 0.9rem;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.add-link-btn:hover {
+  background: rgba(0, 170, 255, 0.1);
+}
+
+/* Custom file input */
+.hidden-input {
+  display: none;
+}
+.bg-control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.custom-file-btn {
+  flex-grow: 1;
+  background: var(--card-hover);
+  color: var(--text);
+  padding: 10px;
+  border-radius: var(--radius);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.custom-file-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Manager Link List */
+.link-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.link-manager-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--card-hover);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.link-manager-item .link-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.link-actions {
+  display: flex;
+  gap: 8px;
+}
